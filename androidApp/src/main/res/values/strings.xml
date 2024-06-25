@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="loading_error_message">Error occurred</string>
+    <string name="password_hint">Password</string>
+    <string name="login_button_label">"Login "</string>
+    <string name="email_hint">Email</string>
+    <string name="username_hint">Username</string>
+    <string name="signup_button_hint">Sign up</string>
+</resources>

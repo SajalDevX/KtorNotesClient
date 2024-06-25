@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.compose.compiler)
+    id("com.google.devtools.ksp") version "1.9.23-1.0.20"
+    kotlin("plugin.serialization") version "1.9.10"
 }
 
 android {
@@ -40,7 +42,17 @@ dependencies {
     implementation(projects.shared)
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
-    implementation(libs.compose.material3)
+    implementation("androidx.compose.material:material:1.6.8")
     implementation(libs.androidx.activity.compose)
     debugImplementation(libs.compose.ui.tooling)
+
+    implementation("androidx.core:core-splashscreen:1.0.1")
+
+    implementation("io.insert-koin:koin-androidx-compose:3.4.1")
+
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.1")
+
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.28.0")
+
+    implementation("io.coil-kt:coil-compose:2.4.0")
 }
