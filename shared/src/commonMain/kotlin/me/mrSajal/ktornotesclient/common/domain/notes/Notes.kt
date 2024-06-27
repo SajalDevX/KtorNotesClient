@@ -1,10 +1,6 @@
 package me.mrSajal.ktornotesclient.common.domain.notes
 
-import kotlinx.serialization.Serializable
-
-
-@Serializable
-data class NotesEntity(
+data class Notes(
     val noteId: String,
     val noteTitle: String = "",
     val noteContent: String = "",

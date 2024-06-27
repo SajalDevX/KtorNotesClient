@@ -1,7 +1,7 @@
 package me.mrSajal.ktornotesclient.auth.data
 
 import kotlinx.serialization.Serializable
-import me.mrSajal.ktornotesclient.common.domain.notes.NotesEntity
+import me.mrSajal.ktornotesclient.common.data.model.RemoteNotes
 
 @Serializable
 internal data class SignUpRequest(
@@ -28,5 +28,5 @@ internal data class AuthResponseData(
     val name: String="",
     val imageUrl:String?= null,
     val token: String="",
-    val notes: List<NotesEntity> = listOf()
+    val notes: List<RemoteNotes> = listOf()
 )
