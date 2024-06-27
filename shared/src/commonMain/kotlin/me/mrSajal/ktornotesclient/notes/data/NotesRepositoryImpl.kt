@@ -27,14 +27,15 @@ internal class NotesRepositoryImpl(
             try {
                 val userData = userPreferences.getUserData()
                 val params = RemoteNotesParams(userData.userId, noteId)
+                println("Repo response with  $params returns correct")
                 val apiResponse = notesApiService.getNoteById(userData.token, params)
+                println("Repo response with  $params  and response $apiResponse returns correct")
 
                 when (apiResponse.code) {
 
                     HttpStatusCode.OK -> {
                         Result.Success(
                             data = apiResponse.data.note!!.toDomainNotes(),
-
                             )
                     }
 

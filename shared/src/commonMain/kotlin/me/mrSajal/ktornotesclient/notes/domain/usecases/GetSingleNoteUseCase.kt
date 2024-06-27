@@ -8,10 +8,12 @@ import org.koin.core.component.inject
 
 class GetSingleNoteUseCase : KoinComponent {
     private val repository by inject<NotesRepository>()
-
-    suspend operator fun invoke(
-        noteId:String
-    ): Result<Notes> {
-        return repository.getSingleNote(noteId)
+    suspend operator fun invoke(noteId: String): Result<Notes> {
+        val result = repository.getSingleNote(noteId)
+        if (result.data == null) {
+            // Log the issue here
+            println("Use case response: Note with id $noteId returned null from repository")
+        }
+        return result
     }
 }

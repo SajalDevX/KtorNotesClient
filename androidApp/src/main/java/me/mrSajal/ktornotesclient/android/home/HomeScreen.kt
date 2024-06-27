@@ -11,9 +11,12 @@ import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import me.mrSajal.ktornotesclient.android.common.util.Routes
 import me.mrSajal.ktornotesclient.android.home.components.NoteItem
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -23,13 +26,18 @@ fun HomeScreen(
     homeUiState: HomeUiState,
     homeRefreshState: HomeRefreshState,
     onUiAction: (HomeUiAction) -> Unit,
-    onNoteClick: (noteId: String) -> Unit,
     onAddNoteClick: () -> Unit,
+    navController: NavController,
+    fetchNote:()->Unit
 ) {
     val pullRefreshState = rememberPullRefreshState(
         refreshing = homeRefreshState.isRefreshing,
         onRefresh = { onUiAction(HomeUiAction.RefreshAction) },
     )
+    LaunchedEffect(Unit) {
+        fetchNote()
+    }
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -43,7 +51,7 @@ fun HomeScreen(
                     modifier = modifier
                         .fillMaxWidth()
                         .clickable {
-                            onNoteClick(it.noteId)
+                            navController.navigate(Routes.Notes.route + "?noteId=${it.noteId}")
                         },
                     note = it,
                     onDeleteClick = { onUiAction(HomeUiAction.DeleteNoteAction(it.noteId)) }

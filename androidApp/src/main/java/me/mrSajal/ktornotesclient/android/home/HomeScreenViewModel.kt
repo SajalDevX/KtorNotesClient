@@ -24,7 +24,7 @@ class HomeScreenViewModel(
         fetchData()
     }
 
-    private fun fetchData() {
+    fun fetchData() {
         homeRefreshState = homeRefreshState.copy(isRefreshing = true)
         viewModelScope.launch {
             delay(1000)

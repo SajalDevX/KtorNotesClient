@@ -1,10 +1,12 @@
 package me.mrSajal.ktornotesclient.android.notes
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
@@ -18,6 +20,7 @@ class NotesScreenViewModel(
     private val createNoteUseCase: CreateNoteUseCase,
     private val editNoteUseCase: EditNoteUseCase,
     private val getSingleNoteUseCase: GetSingleNoteUseCase,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     var notesUiState by mutableStateOf(NotesUiState())
         private set
@@ -25,11 +28,24 @@ class NotesScreenViewModel(
         private set
     var contentTextFieldValue by mutableStateOf(TextFieldValue(text = ""))
         private set
+    private var currentNoteId: String? = null
+    var isEdit by mutableStateOf(false)
+
+    init {
+        savedStateHandle.get<String>("noteId")?.let { noteId ->
+            if (noteId.isNotEmpty()) {
+                currentNoteId = noteId
+                fetchNoteById(noteId)
+                isEdit = true
+            }
+        }
+    }
+
 
     fun createNote() {
         notesUiState = notesUiState.copy(isLoading = true)
         viewModelScope.launch {
-            val request = createNoteUseCase(titleTextFieldValue.text,contentTextFieldValue.text)
+            val request = createNoteUseCase(titleTextFieldValue.text, contentTextFieldValue.text)
             notesUiState = if (request.data == true) {
                 notesUiState.copy(
                     isLoading = false,
@@ -45,30 +61,18 @@ class NotesScreenViewModel(
             }
         }
     }
-
-    fun fetchNote(noteId: String) {
-        notesUiState = notesUiState.copy(isLoading = true)
+    private fun fetchNoteById(noteId: String) {
         viewModelScope.launch {
-            val request = getSingleNoteUseCase(noteId)
-            if (request.data != null) {
-                notesUiState = notesUiState.copy(
-                    isLoading = false,
-                    note = request.data
-                )
-                titleTextFieldValue = titleTextFieldValue.copy(
-                    text = notesUiState.note?.noteTitle ?: "",
-                    selection = TextRange(index = notesUiState.note?.noteTitle?.length ?: 0)
-                )
-                contentTextFieldValue = contentTextFieldValue.copy(
-                    text = notesUiState.note?.noteContent ?: "",
-                    selection = TextRange(index = notesUiState.note?.noteContent?.length ?: 0)
-                )
-
-            } else {
-                notesUiState = notesUiState.copy(
-                    isLoading = false,
-                    errorMessage = request.message
-                )
+            try {
+                val note = getSingleNoteUseCase(noteId).data
+                if (note != null) {
+                    titleTextFieldValue = TextFieldValue(text = note.noteTitle)
+                    contentTextFieldValue = TextFieldValue(text = note.noteContent)
+                } else {
+                    Log.e("NotesScreenViewModel", "Note with id $noteId is null")
+                }
+            } catch (e: Exception) {
+                Log.e("NotesScreenViewModel", "Error fetching note with id $noteId", e)
             }
         }
     }
@@ -81,14 +85,12 @@ class NotesScreenViewModel(
         contentTextFieldValue = content
     }
 
-    fun editNote(
-        noteId: String
-    ) {
+    fun editNote() {
         notesUiState = notesUiState.copy(isLoading = true)
         viewModelScope.launch {
             val title = titleTextFieldValue.text
             val content = contentTextFieldValue.text
-            val result = editNoteUseCase(noteId,title,content )
+            val result = editNoteUseCase(currentNoteId!!, title, content)
             notesUiState = if (result.data == true) {
                 notesUiState.copy(
                     isLoading = false,

@@ -15,11 +15,10 @@ fun Home(
         homeUiState = viewModel.homeUiState,
         homeRefreshState = viewModel.homeRefreshState,
         onUiAction = { viewModel.onUiAction(it) },
-        onNoteClick = {
-            navController.navigate(Routes.Notes.withNoteId(it))
-        },
         onAddNoteClick = {
             navController.navigate(Routes.Notes.route)
-        }
+        },
+        navController = navController,
+        fetchNote = {viewModel.fetchData()}
     )
 }

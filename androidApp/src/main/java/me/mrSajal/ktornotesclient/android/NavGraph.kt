@@ -42,16 +42,21 @@ fun NavGraph(
                 Home(navController)
             }
             composable(
-                route = "${Routes.Notes.route}/{${Routes.Notes.ARG_NOTE_ID}}",
-                arguments = listOf(navArgument(Routes.Notes.ARG_NOTE_ID) {
-                    type = NavType.StringType
-                })
-            ) { backStackEntry ->
-                val noteId = backStackEntry.arguments?.getString(Routes.Notes.ARG_NOTE_ID)
-                Note(noteId = noteId, navController = navController)
+                route = Routes.Notes.route
+            )
+            {
+                Note(navController = navController)
             }
-            composable(Routes.Notes.route) {
-                Note(navController = navController) // This screen could be for adding a new note
+            composable(
+                route = Routes.Notes.route + "?noteId={noteId}",
+                arguments = listOf(
+                    navArgument(name = "noteId") {
+                        type = NavType.StringType
+                        defaultValue = ""
+                    }
+                )
+            ) {
+                Note(navController = navController)
             }
         }
 

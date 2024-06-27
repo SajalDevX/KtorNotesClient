@@ -6,9 +6,12 @@ import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
+import io.ktor.client.statement.readText
 import me.mrSajal.ktornotesclient.common.data.model.EditNoteParams
 import me.mrSajal.ktornotesclient.common.data.model.InsertNoteParams
 import me.mrSajal.ktornotesclient.common.data.model.NotesApiResponse
+import me.mrSajal.ktornotesclient.common.data.model.NotesApiResponseData
 import me.mrSajal.ktornotesclient.common.data.model.RemoteNotesParams
 import me.mrSajal.ktornotesclient.common.domain.notes.Notes
 
@@ -30,12 +33,21 @@ internal class NotesApiService : KtorApi() {
         userToken: String,
         notesParams: RemoteNotesParams
     ): NotesApiResponse {
-        val httpResponse = client.get {
-            endPoint(path = "/note/fetch")
-            setBody(notesParams)
-            setToken(userToken)
+        try {
+            val httpResponse = client.get {
+                endPoint(path = "/note/fetch")
+                parameter("userId",notesParams.userId)
+                parameter("noteId",notesParams.noteId)
+                setToken(userToken)
+            }
+
+            println("API Service response: ${httpResponse.bodyAsText()}")
+
+            return NotesApiResponse(code = httpResponse.status, data = httpResponse.body())
+        } catch (e: Exception) {
+            println("API Service error: ${e.message}")
+            throw e
         }
-        return NotesApiResponse(code = httpResponse.status, data = httpResponse.body())
     }
 
     suspend fun deleteNote(
@@ -47,6 +59,7 @@ internal class NotesApiService : KtorApi() {
             setBody(notesParams)
             setToken(userToken)
         }
+
         return NotesApiResponse(code = httpResponse.status, data = httpResponse.body())
     }
 

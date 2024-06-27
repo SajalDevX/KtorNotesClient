@@ -11,10 +11,12 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -31,33 +33,64 @@ fun NotesScreen(
     onContentChange: (TextFieldValue) -> Unit,
     onCreateButtonClick: () -> Unit,
     onEditButtonClick: () -> Unit,
+    isEdit: Boolean,
     onSucceed: () -> Unit,
-    fetchNote: () -> Unit
 ) {
     val context = LocalContext.current
 
-    LaunchedEffect(Unit) {
-        fetchNote()
-    }
     LaunchedEffect(
         key1 = notesUiState.success,
-        key2 = notesUiState.errorMessage,
-        block = {
-            if (notesUiState.success){
-                onSucceed()
-            }
+        key2 = notesUiState.errorMessage
+    ) {
+        if (notesUiState.success) {
+            onSucceed()
+        }
+        if (notesUiState.errorMessage != null) {
+            Toast.makeText(context, notesUiState.errorMessage, Toast.LENGTH_SHORT).show()
+        }
+    }
 
-            if (notesUiState.note != null && notesUiState.errorMessage != null){
-                Toast.makeText(context, notesUiState.errorMessage, Toast.LENGTH_SHORT).show()
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        NoteTextField(
+            value = titleTextFieldValue,
+            onValueChange = onTitleChange,
+            placeholder = stringResource(id = R.string.note_title)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        NoteTextField(
+            value = contentTextFieldValue,
+            onValueChange = onContentChange,
+            placeholder = stringResource(id = R.string.note_content)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        if (notesUiState.isLoading) {
+            CircularProgressIndicator()
+        } else {
+            Button(
+                onClick = {
+                    if (!isEdit) {
+                        onCreateButtonClick()
+                    } else {
+                        onEditButtonClick()
+                    }
+                },
+                modifier = Modifier.align(Alignment.End)
+            ) {
+                Text(text = if (!isEdit) "Create Note" else "Edit Note")
             }
         }
-    )
+    }
 }
 
 @Composable
 fun NoteTextField(
     modifier: Modifier = Modifier,
     value: TextFieldValue,
+    placeholder: String,
     onValueChange: (TextFieldValue) -> Unit
 ) {
     TextField(
@@ -65,11 +98,9 @@ fun NoteTextField(
             .fillMaxWidth()
             .height(90.dp),
         value = value,
-        onValueChange = {
+        onValueChange = { newValue ->
             onValueChange(
-                TextFieldValue(
-                    text = it.text,
-                )
+                newValue
             )
         },
         colors = TextFieldDefaults.textFieldColors(
@@ -84,7 +115,7 @@ fun NoteTextField(
         textStyle = MaterialTheme.typography.body2,
         placeholder = {
             Text(
-                text = stringResource(id = R.string.user_note_content),
+                text = placeholder,
                 style = MaterialTheme.typography.body2
             )
         },

@@ -12,7 +12,7 @@ val appModule = module {
     viewModel { LoginViewModel(get()) }
     viewModel {SignUpViewModel(get())}
     viewModel { MainActivityViewModel(get()) }
-    viewModel { NotesScreenViewModel(get(),get(),get()) }
+    viewModel { NotesScreenViewModel(get(),get(),get(),get()) }
     viewModel { HomeScreenViewModel(get(),get()) }
 
 }

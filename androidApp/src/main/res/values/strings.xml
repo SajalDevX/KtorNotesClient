@@ -7,4 +7,6 @@
     <string name="username_hint">Username</string>
     <string name="signup_button_hint">Sign up</string>
     <string name="user_note_content">Text</string>
+    <string name="note_content">Content</string>
+    <string name="note_title">Title</string>
 </resources>
